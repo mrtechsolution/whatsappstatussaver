@@ -17,6 +17,7 @@ import com.github.clans.fab.FloatingActionButton
 import com.github.clans.fab.FloatingActionMenu
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 import com.mrtech.whatsappstatussaver.HelperMethods
@@ -141,6 +142,13 @@ class ImageViewer : AppCompatActivity() {
 
                 override fun onAdLoaded(ad: RewardedAd) {
                     rewardedAd = ad
+                    rewardedAd!!.show(this@ImageViewer, object : OnUserEarnedRewardListener{
+                        override fun onUserEarnedReward(p0: RewardItem) {
+                            Log.d(TAG, "onUserEarnedReward."+p0.amount)
+
+                        }
+
+                    })
                     Log.d(TAG, "Ad was loaded.")
                 }
             })

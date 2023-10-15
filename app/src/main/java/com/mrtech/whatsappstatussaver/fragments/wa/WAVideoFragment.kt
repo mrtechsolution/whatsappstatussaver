@@ -30,6 +30,7 @@ import android.content.DialogInterface.OnShowListener
 import org.apache.commons.io.comparator.LastModifiedFileComparator
 import android.util.SparseBooleanArray
 import android.app.Activity
+import android.os.Build
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -276,10 +277,20 @@ class WAVideoFragment : Fragment() {
 
     val status: Unit
         get() {
-            val listFiles = File(
-                StringBuffer().append(Environment.getExternalStorageDirectory().absolutePath)
-                    .append("/WhatsApp/Media/.Statuses/").toString()
-            ).listFiles()
+
+            var targetPath =
+                Environment.getExternalStorageDirectory().absolutePath + "/WhatsApp/Media/.Statuses"
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                targetPath =
+                    Environment.getExternalStorageDirectory().absolutePath + "/Android/media/com.whatsapp/WhatsApp/Media/.Statuses"
+            }
+
+            val listFiles = File(targetPath).listFiles()
+//            val listFiles = File(
+//                StringBuffer().append(Environment.getExternalStorageDirectory().absolutePath)
+//                    .append("/WhatsApp/Media/.Statuses/").toString()
+//            ).listFiles()
             if (listFiles != null && listFiles.size >= 1) {
                 Arrays.sort(listFiles, LastModifiedFileComparator.LASTMODIFIED_REVERSE)
             }
@@ -294,6 +305,8 @@ class WAVideoFragment : Fragment() {
                     }
                 }
             }
+
+            Log.i(javaClass.name, "arrayList==>"+arrayList.size)
         }
 
     fun deleteRows() {

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -311,10 +312,19 @@ class BWAImageFragment : Fragment() {
 
     val status: Unit
         get() {
-            val listFiles = File(
-                StringBuffer().append(Environment.getExternalStorageDirectory().absolutePath)
-                    .append("/WhatsApp Business/Media/.Statuses/").toString()
-            ).listFiles()
+            var targetPath =
+                Environment.getExternalStorageDirectory().absolutePath + "/WhatsApp Business/Media/.Statuses"
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                targetPath =
+                    Environment.getExternalStorageDirectory().absolutePath + "/Android/media/com.whatsapp/WhatsApp Business/Media/.Statuses"
+            }
+
+            val listFiles = File(targetPath).listFiles()
+//            val listFiles = File(
+//                StringBuffer().append(Environment.getExternalStorageDirectory().absolutePath)
+//                    .append("/WhatsApp Business/Media/.Statuses/").toString()
+//            ).listFiles()
             if (listFiles != null && listFiles.size >= 1) {
                 Arrays.sort(listFiles, LastModifiedFileComparator.LASTMODIFIED_REVERSE)
             }

@@ -31,6 +31,7 @@ import org.apache.commons.io.comparator.LastModifiedFileComparator
 import android.util.SparseBooleanArray
 import android.app.Activity
 import android.app.AlertDialog
+import android.os.Build
 import android.util.Log
 import android.view.View
 import androidx.appcompat.view.ActionMode
@@ -40,6 +41,7 @@ import com.github.clans.fab.FloatingActionButton
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.android.gms.ads.rewarded.RewardItem
 import com.google.android.gms.ads.rewarded.RewardedAd
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 //import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
@@ -205,9 +207,18 @@ class WAImageFragment : Fragment() {
 
                                 override fun onAdLoaded(ad: RewardedAd) {
                                     rewardedAd = ad
+                                    rewardedAd!!.show(requireActivity(), object : OnUserEarnedRewardListener{
+                                        override fun onUserEarnedReward(p0: RewardItem) {
+                                            Log.d(TAG, "onUserEarnedReward."+p0.amount)
+
+                                        }
+
+                                    })
                                     Log.d(TAG, "Ad was loaded.")
                                 }
                             })
+
+
                         rewardedAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
                             override fun onAdClicked() {
                                 // Called when a click is recorded for an ad.
@@ -233,15 +244,15 @@ class WAImageFragment : Fragment() {
                                 Log.d(TAG, "Ad showed fullscreen content.")
                             }
                         }
-//                            val str = waImageAdapter!!.getItem(position).path
-//                            try {
-//                                val intent = Intent(getActivity(), ImageViewer::class.java)
-//                                intent.putExtra("pos", str)
-//                                intent.putExtra("position", position)
-//                                startActivityForResult(intent, 1)
-//                            } catch (e: Throwable) {
-//                                throw NoClassDefFoundError(e.message)
-//                            }
+                            val str = waImageAdapter!!.getItem(position).path
+                            try {
+                                val intent = Intent(getActivity(), ImageViewer::class.java)
+                                intent.putExtra("pos", str)
+                                intent.putExtra("position", position)
+                                startActivityForResult(intent, 1)
+                            } catch (e: Throwable) {
+                                throw NoClassDefFoundError(e.message)
+                            }
 //                        }
                     }
 
@@ -352,10 +363,21 @@ class WAImageFragment : Fragment() {
 
     val status: Unit
         get() {
-            val listFiles = File(
-                StringBuffer().append(Environment.getExternalStorageDirectory().absolutePath)
-                    .append("/WhatsApp/Media/.Statuses/").toString()
-            ).listFiles()
+            Log.i(javaClass.name, "AbsolutePath==>"+Environment.getExternalStorageDirectory().absolutePath)
+//            val listFiles = File(
+//                StringBuffer().append(Environment.getExternalStorageDirectory().absolutePath)
+//                    .append("/WhatsApp/Media/.Statuses/").toString()
+//            ).listFiles()
+
+            var targetPath =
+                Environment.getExternalStorageDirectory().absolutePath + "/WhatsApp/Media/.Statuses"
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                targetPath =
+                    Environment.getExternalStorageDirectory().absolutePath + "/Android/media/com.whatsapp/WhatsApp/Media/.Statuses"
+            }
+
+            val listFiles = File(targetPath).listFiles()
             if (listFiles != null && listFiles.size >= 1) {
                 Arrays.sort(listFiles, LastModifiedFileComparator.LASTMODIFIED_REVERSE)
             }
